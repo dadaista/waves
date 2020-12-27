@@ -1,5 +1,7 @@
 const ELEMENT_SIZE = 40;
 const GRID_SIZE = 80;
+const INITIAL_ENERGY=255;
+var theTime=0;
 
 var paintElement= function (x,y,c){
     let energy = getEnergy(x,y);
@@ -17,17 +19,16 @@ var repaint=function(){
             paintElement(x,y,c);
 }
 
-var update = function(t){
+var update = function(){
     var el = document.getElementById("theTime");
-    el.innerHTML=t+"";
+    el.innerHTML=theTime+"";
 }
 
 
 var getEnergy=function(x,y){
-    return 122;
+    return INITIAL_ENERGY*Math.pow(0.95,theTime);
 }
 
-var main = function(canvas){ 
-    var theTime=0;   
-    setInterval(()=>{repaint();theTime++;update(theTime)},1000);
+var main = function(canvas){    
+    setInterval(()=>{repaint();theTime++;update()},1000);
 }
