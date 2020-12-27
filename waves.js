@@ -8,11 +8,18 @@ var paintElement= function (x,y,c){
     c.strokeStyle='#ffffff';
     c.strokeRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
 }
-var main = function(canvas){
+
+
+var repaint=function(){
     var c = canvas.getContext('2d');
     for(var x=0;x<GRID_SIZE;x++)
         for(var y=0;y<GRID_SIZE;y++)
             paintElement(x,y,c);
+}
+
+var update = function(t){
+    var el = document.getElementById("theTime");
+    el.innerHTML=t+"";
 }
 
 
@@ -20,3 +27,7 @@ var getEnergy=function(x,y){
     return 122;
 }
 
+var main = function(canvas){ 
+    var theTime=0;   
+    setInterval(()=>{repaint();theTime++;update(theTime)},1000);
+}
