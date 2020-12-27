@@ -2,7 +2,8 @@ const ELEMENT_SIZE = 40;
 const GRID_SIZE = 80;
 
 var paintElement= function (x,y,c){
-    c.fillStyle='#000000';
+    let energy = getEnergy(x,y);
+    c.fillStyle='rgb('+energy+',0,0)';
     c.fillRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
     c.strokeStyle='#ffffff';
     c.strokeRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
@@ -15,5 +16,7 @@ var main = function(canvas){
 }
 
 
-
+var getEnergy=function(x,y){
+    return 122;
+}
 
