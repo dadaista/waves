@@ -40,18 +40,16 @@ var repaint=function(){
 var update = function(){
     var el = document.getElementById("theTime");
     el.innerHTML=theTime+"";
-
     
     for(var x=0;x<GRID_SIZE;x++){
         for(var y=0;y<GRID_SIZE;y++){
-            if(energy(x,y)<energy(x-1,y)) push(x,y,pop(x-1,y));
-           // if(energy(x,y)<energy(x+1,y)) push(x,y,pop(x+1,y));
-            //if(energy(x,y)<energy(x,y+1)) push(x,y,pop(x,y+1));
-            //if(energy(x,y)<energy(x,y-1)) push(x,y,pop(x,y-1));
+            var emit = Math.random()*energy(x,y) > 1;
+            var direction = [[1,0],[-1,0],[0,1],[0,-1]][parseInt(Math.random()*4)];
+            if(emit) push(x+direction[0],y+direction[1],pop(x,y));
         }
     }
 
-    console.log(states);
+    //console.log(states);
     
 }
 
@@ -59,5 +57,5 @@ var update = function(){
 
 
 var main = function(canvas){    
-    setInterval(()=>{theTime++;update(),repaint()},1000);
+    setInterval(()=>{theTime++;update(),repaint()},100);
 }
