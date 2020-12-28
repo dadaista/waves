@@ -1,31 +1,21 @@
 const ELEMENT_SIZE = 40;
-const GRID_SIZE = 80;
-const INITIAL_ENERGY=255;
+const GRID_SIZE = 4;
 var theTime=0;
 
-var actualStates=Array(GRID_SIZE * GRID_SIZE);
-var tmpStates = Array(GRID_SIZE * GRID_SIZE);
-
-var getState=function(x,y){
-    let idx=x*GRID_SIZE + y;
-    if (actualStates[idx] === undefined) return 0;
-    return actualStates[idx];
-}
-
-var setState=function(x,y,val){
-    let idx=x*GRID_SIZE + y;
-    actualStates[idx] = val;
-}
-
-var setTmpState=function(x,y,val){
-    let idx=x*GRID_SIZE + y;
-    tmpStates[idx] = val;
-}
+var states=Array(GRID_SIZE * GRID_SIZE).fill(40);
+var tmpStates=Array(GRID_SIZE * GRID_SIZE);
 
 
+var index = (x,y) => x*GRID_SIZE + y;
+
+ 
+
+//contour state init
+states[index(1,1)] = 120;
 
 var paintElement= function (x,y,c){
-    let energy = getState(x,y);
+    let energy = states[index(x,y)];
+
     c.fillStyle='rgb('+energy+',0,0)';
     c.fillRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
     c.strokeStyle='#ffffff';
@@ -43,6 +33,17 @@ var repaint=function(){
 var update = function(){
     var el = document.getElementById("theTime");
     el.innerHTML=theTime+"";
+
+    tmpStates[0]=2;
+    for(var x=0;x<GRID_SIZE;x++){
+        for(var y=0;y<GRID_SIZE;y++){
+            tmpStates[index(x,y)] = states[index(x,y-1)]===undefined?0:states[index(x,y-1)];
+        }
+    }
+
+    console.log(tmpStates);
+    states = tmpStates;
+    
 }
 
 
