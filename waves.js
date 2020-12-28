@@ -1,5 +1,5 @@
-const ELEMENT_SIZE = 40;
-const GRID_SIZE = 4;
+const ELEMENT_SIZE = 20;
+const GRID_SIZE = 30;
 var theTime=0;
 
 var states=Array(GRID_SIZE * GRID_SIZE);
@@ -16,12 +16,17 @@ var push = function(x,y,val){
     return states[index(x,y)].push(val);
 }
 //contour state init
-states[index(1,1)] = Array(120).fill(1);
+states[index(1,1)] = Array(70000).fill(1);
+states[index(10,10)] = Array(50000).fill(1);
 
 var paintElement= function (x,y,c){
     
-
-    c.fillStyle='rgb('+energy(x,y)+',0,0)';
+    var val = energy(x,y);
+    let R=parseInt(val >= 256*256 ? 128 + (val / (256*256*2)) : 0 );
+    let G=parseInt(val< 256*256 && val>=256 ? 128 + (val / 512)  : 0);
+    let B=parseInt(val<256 ? 50 + val/2 : 0);
+    
+    c.fillStyle='rgb('+R+','+G+','+B+')';
     c.fillRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
     c.strokeStyle='#ffffff';
     c.strokeRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
@@ -45,11 +50,13 @@ var update = function(){
         for(var y=0;y<GRID_SIZE;y++){
             var emit = Math.random()*energy(x,y) > 1;
             var direction = [[1,0],[-1,0],[0,1],[0,-1]][parseInt(Math.random()*4)];
-            if(emit) push(x+direction[0],y+direction[1],pop(x,y));
+            if(emit) 
+                if(x+direction[0]>=0 && x+direction[0]<GRID_SIZE)
+                    if(y+direction[1]>=0 && y+direction[1]<GRID_SIZE)
+                        push(x+direction[0],y+direction[1],pop(x,y));
         }
     }
 
-    //console.log(states);
     
 }
 
@@ -57,5 +64,5 @@ var update = function(){
 
 
 var main = function(canvas){    
-    setInterval(()=>{theTime++;update(),repaint()},100);
+    setInterval(()=>{theTime++;update(),repaint()},1000);
 }
