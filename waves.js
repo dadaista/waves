@@ -3,8 +3,29 @@ const GRID_SIZE = 80;
 const INITIAL_ENERGY=255;
 var theTime=0;
 
+var actualStates=Array(GRID_SIZE * GRID_SIZE);
+var tmpStates = Array(GRID_SIZE * GRID_SIZE);
+
+var getState=function(x,y){
+    let idx=x*GRID_SIZE + y;
+    if (actualStates[idx] === undefined) return 0;
+    return actualStates[idx];
+}
+
+var setState=function(x,y,val){
+    let idx=x*GRID_SIZE + y;
+    actualStates[idx] = val;
+}
+
+var setTmpState=function(x,y,val){
+    let idx=x*GRID_SIZE + y;
+    tmpStates[idx] = val;
+}
+
+
+
 var paintElement= function (x,y,c){
-    let energy = getEnergy(x,y);
+    let energy = getState(x,y);
     c.fillStyle='rgb('+energy+',0,0)';
     c.fillRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
     c.strokeStyle='#ffffff';
@@ -25,10 +46,8 @@ var update = function(){
 }
 
 
-var getEnergy=function(x,y){
-    return INITIAL_ENERGY*Math.pow(0.95,theTime);
-}
+
 
 var main = function(canvas){    
-    setInterval(()=>{repaint();theTime++;update()},1000);
+    setInterval(()=>{theTime++;update();repaint();},1000);
 }
