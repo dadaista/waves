@@ -1,5 +1,5 @@
 const ELEMENT_SIZE = 40;
-const GRID_SIZE = 4;
+const GRID_SIZE = 5;
 var theTime=0;
 
 var states=Array(GRID_SIZE * GRID_SIZE).fill(0);
@@ -19,17 +19,16 @@ var decr = function(x,y,delta){
 }
 
 //contour state init
-states[index(1,1)] = 10;
-states[index(3,3)] = 50000;
+states[index(1,1)] = GRID_SIZE * GRID_SIZE;
 
 
 
 var paintElement= function (x,y,c){
     
     var val = state(x,y);
-    let R=parseInt(val >= 256*256 ? 128 + (val / (256*256*2)) : 0 );
-    let G=parseInt(val< 256*256 && val>=256 ? 128 + (val / 512)  : 0);
-    let B=parseInt(val<256 ? 50 + val/2 : 0);
+    let R=parseInt(val * 255 / (GRID_SIZE*GRID_SIZE) );
+    let G=0;
+    let B=0;
     
     c.fillStyle='rgb('+R+','+G+','+B+')';
     c.fillRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
@@ -55,11 +54,13 @@ var update = function(){
         for(var y=0;y<GRID_SIZE;y++){
             var emit = Math.random()*state(x,y) > 1;
             var direction = [[1,0],[-1,0],[0,1],[0,-1]][parseInt(Math.random()*4)];
+            var delta = state(x,y)>=ELEMENT_SIZE*2 ? ELEMENT_SIZE : parseInt(state(x,y)/2);
             if(emit) 
                 if(x+direction[0]>=0 && x+direction[0]<GRID_SIZE)
-                    if(y+direction[1]>=0 && y+direction[1]<GRID_SIZE){
-                        incr(x+direction[0],y+direction[1],decr(x,y,1));
-                    }
+                    if(y+direction[1]>=0 && y+direction[1]<GRID_SIZE)
+                        if(state(x+direction[0],y+direction[1])+delta<=state(x,y))
+                            incr(x+direction[0],y+direction[1],decr(x,y,delta));
+                    
                         
         }
     }
