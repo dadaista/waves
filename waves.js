@@ -1,5 +1,5 @@
-const ELEMENT_SIZE = 40;
-const GRID_SIZE = 5;
+const ELEMENT_SIZE = 90;
+const GRID_SIZE = 3;
 var theTime=0;
 
 var states=Array(GRID_SIZE * GRID_SIZE).fill(0);
@@ -24,14 +24,14 @@ var decr = function(x,y,delta){
 
 
 //we have a generator in 3,2
-var isGenerator = (x,y) => x == 3 && y == 2;
+var isGenerator = (x,y) => false; //x == 1 && y == 1;
 
 //we have a drain in 2,4
 var isDrain = (x,y) => x == 2 && y == 4;
 
 
 //contour state init
-states[index(3,2)] = 8000;
+states[index(1,1)] = 10;
 
 
 var heatMap = function(val){
@@ -83,14 +83,32 @@ var update = function(){
     
     for(var x=0;x<GRID_SIZE;x++){
         for(var y=0;y<GRID_SIZE;y++){
-            var emit = Math.random()*state(x,y) > 1;
-            var direction = [[1,0],[-1,0],[0,1],[0,-1]][parseInt(Math.random()*4)];
-            var delta = state(x,y)>=ELEMENT_SIZE*2 ? ELEMENT_SIZE : parseInt(state(x,y)/2);
-            if(emit) 
-                if(x+direction[0]>=0 && x+direction[0]<GRID_SIZE)
-                    if(y+direction[1]>=0 && y+direction[1]<GRID_SIZE)
-                        if(state(x+direction[0],y+direction[1])+delta<=state(x,y))
-                            incr(x+direction[0],y+direction[1],decr(x,y,delta));
+            var directions = [[1,0],[-1,0],[0,1],[0,-1]];
+
+            for (i=0;i<directions.length;i++){
+
+                let dx = directions[i][0];
+                let dy = directions[i][1];
+                let delta = state(x,y) - state(x+dx, y+dy);
+                delta = delta < 0 ? 0 : delta;
+
+                //if delta <= 0 -> prob = 0
+                //if delta ~= state -> prob ~= 1
+                let prob = delta / state(x,y);
+                console.log(x,y); 
+                console.log("prob:"+prob);
+                let emission = 1; 
+
+                if(Math.random() <= prob) // we have emission here!! 
+                    if(x+dx>=0 && x+dx<GRID_SIZE && y+dy>=0 && y+dy<GRID_SIZE)//be in boundaries
+                            if(state(x+dx,y+dy)+emission<=state(x,y)){
+                                incr(x+dx,y+dy,decr(x,y,emission));
+                                break;
+                            }
+
+            }
+            
+
                     
                         
         }
