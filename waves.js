@@ -1,5 +1,6 @@
-const ELEMENT_SIZE = 90;
-const GRID_SIZE = 3;
+
+const GRID_SIZE = 10;
+const ELEMENT_SIZE = 800 / GRID_SIZE;
 var theTime=0;
 
 var states=Array(GRID_SIZE * GRID_SIZE).fill(0);
@@ -27,11 +28,14 @@ var decr = function(x,y,delta){
 var isGenerator = (x,y) => false; //x == 1 && y == 1;
 
 //we have a drain in 2,4
-var isDrain = (x,y) => x == 2 && y == 4;
+var isDrain = (x,y) => false; //x == 2 && y == 4;
 
+
+var energy = ()=> states.reduce((acc, val) => acc + val);
 
 //contour state init
-states[index(1,1)] = 10;
+center = Math.floor(GRID_SIZE/2);
+states[index(center,center)] = 10000;
 
 
 var heatMap = function(val){
@@ -77,16 +81,30 @@ var repaint=function(){
             paintElement(x,y,c);
 }
 
+
+/* Randomize array in-place using Durstenfeld shuffle algorithm */
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
 var update = function(){
-    var el = document.getElementById("theTime");
-    el.innerHTML=theTime+"";
+    var timeEl = document.getElementById("theTime");
+    timeEl.innerHTML=theTime+"";
+    var energyEl = document.getElementById("energy");
+    energyEl.innerHTML=energy()+"";
+
     
     for(var x=0;x<GRID_SIZE;x++){
         for(var y=0;y<GRID_SIZE;y++){
             var directions = [[1,0],[-1,0],[0,1],[0,-1]];
-
+            shuffleArray(directions);
             for (i=0;i<directions.length;i++){
-
+                
                 let dx = directions[i][0];
                 let dy = directions[i][1];
                 let delta = state(x,y) - state(x+dx, y+dy);
@@ -95,16 +113,16 @@ var update = function(){
                 //if delta <= 0 -> prob = 0
                 //if delta ~= state -> prob ~= 1
                 let prob = delta / state(x,y);
-                console.log(x,y); 
-                console.log("prob:"+prob);
-                let emission = 1; 
+
+                let emission =  Math.ceil(delta * 0.1); 
+                let totEnergy=energy();
 
                 if(Math.random() <= prob) // we have emission here!! 
                     if(x+dx>=0 && x+dx<GRID_SIZE && y+dy>=0 && y+dy<GRID_SIZE)//be in boundaries
-                            if(state(x+dx,y+dy)+emission<=state(x,y)){
-                                incr(x+dx,y+dy,decr(x,y,emission));
-                                break;
-                            }
+                        if(state(x+dx,y+dy)+emission*2<=state(x,y)){
+                            incr(x+dx,y+dy,decr(x,y,emission));                            
+                            break;
+                        }
 
             }
             
@@ -121,5 +139,5 @@ var update = function(){
 
 
 var main = function(canvas){    
-    setInterval(()=>{theTime++;update(),repaint()},1000);
+    setInterval(()=>{theTime++;update(),repaint()},100);
 }
