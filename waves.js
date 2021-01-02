@@ -1,10 +1,10 @@
 
-const GRID_SIZE = 10;
+const GRID_SIZE = 9;
 const ELEMENT_SIZE = 800 / GRID_SIZE;
-var theTime=0;
+var process;
+var theTime;
 
-var states=Array(GRID_SIZE * GRID_SIZE).fill(0);
-
+var states;
 
 var index = (x,y) => x*GRID_SIZE + y;
 var state  = (x,y) => states[index(x,y)];
@@ -33,39 +33,29 @@ var isDrain = (x,y) => false; //x == 2 && y == 4;
 
 var energy = ()=> states.reduce((acc, val) => acc + val);
 
-//contour state init
-center = Math.floor(GRID_SIZE/2);
-states[index(center,center)] = 10000;
+
 
 
 var heatMap = function(val){
-    if (val==0)   return  [0,0,0];
-    if (val<4)    return  [16,0,0];
-    if (val<8)    return  [32,0,0];
-    if (val<16)   return  [64,0,0];
+    if (val==0)   return   "black";
+    if (val<64)    return  "darkblue";
 
-    if (val<64)     return  [0,64,0];
-    if (val<128)    return  [0,90,0];
-    if (val<256)    return  [0,128,0];
-    if (val<512)    return  [0,220,0];
 
-    if (val<1024)      return  
-    if (val<2048)      return  [0,64,64];
-    if (val<4096)      return  [0,128,128];
-    if (val<8192)      return  [0,255,255];    
-    return [255,255,255];
+    if (val<256)    return  "darkred";
+    if (val<512)    return  "darkgreen";
+
+    if (val<4096)      return  "darkyellow";
+    if (val<8192)      return  "yellow";    
+    return "white";
 
 }
 
 var paintElement= function (x,y,c){
     
     var val = state(x,y);
-    let rgb = heatMap(val);
-    let R=rgb[0];
-    let G=rgb[1];
-    let B=rgb[2];
+
     
-    c.fillStyle='rgb('+R+','+G+','+B+')';
+    c.fillStyle=heatMap(val);
     c.fillRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
     c.strokeStyle='#ffffff';
     c.strokeRect(x*ELEMENT_SIZE,y*ELEMENT_SIZE,ELEMENT_SIZE,ELEMENT_SIZE);
@@ -93,6 +83,7 @@ function shuffleArray(array) {
 }
 
 var update = function(){
+
     var timeEl = document.getElementById("theTime");
     timeEl.innerHTML=theTime+"";
     var energyEl = document.getElementById("energy");
@@ -136,8 +127,18 @@ var update = function(){
 }
 
 
+var stop=function(){
+    clearInterval(process);
+}
+var resume=function(){
+    process = setInterval(()=>{theTime++;update(),repaint()},200);
+}
 
-
-var main = function(canvas){    
-    setInterval(()=>{theTime++;update(),repaint()},100);
+var main = function(canvas){  
+    theTime = 0;
+    states=Array(GRID_SIZE * GRID_SIZE).fill(0);  
+    //contour state init
+    center = Math.floor(GRID_SIZE/2);
+    states[index(center,center)] = 9000;
+    resume(); 
 }
